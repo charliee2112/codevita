@@ -21,6 +21,7 @@ namespace CodeVIta
                     Console.WriteLine("1-> Polygons");
                     Console.WriteLine("2-> Superman");
                     Console.WriteLine("3-> Jumping Superman");
+                    Console.WriteLine("4-> Snake");
                     Console.WriteLine("x-> Exit");
                     option = Console.ReadKey().KeyChar;
                     Console.WriteLine();
@@ -39,6 +40,11 @@ namespace CodeVIta
                         case '3':
                             {
                                 RunSupermanJumpExamples();
+                            }
+                            break;
+                        case '4':
+                            {
+                                RunSnakeExamples();
                             }
                             break;
                         case 'x':
@@ -138,9 +144,10 @@ namespace CodeVIta
 
             List<Tuple<string, string>> result = new List<Tuple<string, string>>();
             SupermanJumpRecursive("", lex, jumps, result, new Tuple<string, string>("", superman));
-            result.Add(new Tuple<string, string>(result.Last().Item2,lex));
+            result.Add(new Tuple<string, string>(result.Last().Item2, lex));
 
-            result.ForEach(x => {
+            result.ForEach(x =>
+            {
                 Console.Write("  " + x.Item2);
             });
             Console.WriteLine();
@@ -542,6 +549,170 @@ namespace CodeVIta
                 }
             });
             return isvalidpath;
+        }
+        #endregion
+
+        #region Snake
+
+        private static void Superman(string[] data)
+        {
+            string[] hangar = data.Take(2).ToArray();
+            List<Tuple<int, int>> aux = SnakeJump(hangar);
+            List<List<Tuple<int, int>>> table = new List<List<Tuple<int, int>>>();
+            for (int i = 2; i< data.Length - 1; i += 2)
+            {
+
+                int index = aux.IndexOf(new Tuple<int, int>(int.Parse(data[i]), int.Parse(data[i + 1])));
+                table.Add(aux.Take(index).Reverse().ToList());
+            }
+            int j = 0;
+            table.ForEach(x=> 
+            {
+                Console.Write((j++)+": ");
+                x.ForEach(y =>
+                {
+                    Console.Write(y.Item1 + "," + y.Item2 + "; ");
+                });
+                Console.WriteLine();
+            });
+        }
+
+        private static void RunSnakeExamples()
+        {
+            List<string> data = new List<string>();
+            data.Add("2,2,2,1,2,0,1,1,1,2");
+            data.Add("3,3,0,0");
+            data.ToList().ForEach(x =>
+            {
+                Console.WriteLine("For input: ");
+                ShowSnakeJumpInputs(x);
+                Console.WriteLine("The output is: ");
+                Superman(x.Split(',').ToArray());
+            });
+        }
+
+        private static void ShowSnakeJumpInputs(string x)
+        {
+            Console.Write("{ ");
+            x.ToList().ForEach(y =>
+            {
+                Console.Write(y + " ");
+            });
+            Console.Write("}");
+            Console.WriteLine();
+        }
+
+        //No length is bigger or equal to the sum of all lengths
+        public static List<Tuple<int, int>> SnakeJump(string[] data)
+        {
+            Tuple<int, int> hangar = new Tuple<int, int>(Convert.ToInt32(data[0]), Convert.ToInt32(data[1]));
+            List<Tuple<int, int>> result = new List<Tuple<int, int>>();
+            if (hangar.Item2 % 2 == 0)
+            {
+                SnakeRecursive1(result, hangar);
+            }
+            else
+            {
+                SnakeRecursive2(result, hangar);
+            }
+            return result;
+        }
+
+        private static List<Tuple<int, int>> SnakeRecursive1(List<Tuple<int, int>> pathSoFar, Tuple<int, int> nextStep)
+        {
+            bool isValidStep = nextStep.Item1 > -1 && nextStep.Item2 > -1 && nextStep.Item2 < 6 && nextStep.Item1 < 6 && !pathSoFar.Contains(nextStep);
+            //Can I actually take that step?
+            if (isValidStep)
+            {
+                pathSoFar.Add(nextStep);
+                //And here I did not yet reach my destination, I need to take another step. The first that comes up with a solution will be good enough
+                List<Tuple<int, int>> aux = SnakeRecursive1(pathSoFar, new Tuple<int, int>(nextStep.Item1 + 1, nextStep.Item2));
+                if (aux == null)
+                {
+                    aux = SnakeRecursive1(pathSoFar, new Tuple<int, int>(nextStep.Item1, nextStep.Item2 + 1));
+                    if (aux == null)
+                    {
+                        aux = SnakeRecursive1(pathSoFar, new Tuple<int, int>(nextStep.Item1 - 1, nextStep.Item2));
+                        if (aux == null)
+                        {
+                            aux = SnakeRecursive1(pathSoFar, new Tuple<int, int>(nextStep.Item1, nextStep.Item2 - 1));
+                            if (aux == null)
+                            {
+                                pathSoFar.Remove(pathSoFar.Single(x => x.Item1.Equals(nextStep.Item1) && x.Item2.Equals(nextStep.Item2)));
+                                return pathSoFar;
+                            }
+                            else
+                            {
+                                return aux;
+                            }
+                        }
+                        else
+                        {
+                            return aux;
+                        }
+                    }
+                    else
+                    {
+                        return aux;
+                    }
+                }
+                else
+                {
+                    return aux;
+                }
+            }
+            else
+            {
+                return null;
+            }
+        }
+        private static List<Tuple<int, int>> SnakeRecursive2(List<Tuple<int, int>> pathSoFar, Tuple<int, int> nextStep)
+        {
+            bool isValidStep = nextStep.Item1 > -1 && nextStep.Item2 > -1 && nextStep.Item2 < 6 && nextStep.Item1 < 6 && !pathSoFar.Contains(nextStep);
+            //Can I actually take that step?
+            if (isValidStep)
+            {
+                pathSoFar.Add(nextStep);
+                //And here I did not yet reach my destination, I need to take another step. The first that comes up with a solution will be good enough
+                List<Tuple<int, int>> aux = SnakeRecursive2(pathSoFar, new Tuple<int, int>(nextStep.Item1 + 1, nextStep.Item2));
+                if (aux == null)
+                {
+                    aux = SnakeRecursive2(pathSoFar, new Tuple<int, int>(nextStep.Item1, nextStep.Item2 - 1));
+                    if (aux == null)
+                    {
+                        aux = SnakeRecursive2(pathSoFar, new Tuple<int, int>(nextStep.Item1 - 1, nextStep.Item2));
+                        if (aux == null)
+                        {
+                            aux = SnakeRecursive2(pathSoFar, new Tuple<int, int>(nextStep.Item1, nextStep.Item2 + 1));
+                            if (aux == null)
+                            {
+                                pathSoFar.Remove(pathSoFar.Single(x => x.Item1.Equals(nextStep.Item1) && x.Item2.Equals(nextStep.Item2)));
+                                return pathSoFar;
+                            }
+                            else
+                            {
+                                return aux;
+                            }
+                        }
+                        else
+                        {
+                            return aux;
+                        }
+                    }
+                    else
+                    {
+                        return aux;
+                    }
+                }
+                else
+                {
+                    return aux;
+                }
+            }
+            else
+            {
+                return null;
+            }
         }
         #endregion
     }
