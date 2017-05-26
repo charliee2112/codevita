@@ -8,6 +8,7 @@ namespace CodeVIta
 {
     public class Program
     {
+        public delegate string Exercise(string input);
         static void Main(string[] args)
         {
             char option;
@@ -29,7 +30,7 @@ namespace CodeVIta
                     {
                         case '1':
                             {
-                                RunPolygonsExamples();
+                                TestPolygon(PolygonTestCases(),RunExamples(Polygons, PolygonTestCases()));
                             }
                             break;
                         case '2':
@@ -76,6 +77,14 @@ namespace CodeVIta
                 }
             }
             while (!leaving);
+        }
+
+        private static string RunExamples(Exercise exercise, string cases)
+        {
+            string output = "";
+            cases = cases.Substring(0, cases.Length - 1);
+            cases.Split(';').ToList().ForEach(x => { output += (exercise(x) + ""); });
+            return output;
         }
 
         #region SupermanJump
@@ -196,11 +205,23 @@ namespace CodeVIta
 
         #endregion
 
-
         #region Polygons
-
-        private static void RunPolygonsExamples()
+        
+        private static void TestPolygon(string input, string output)
         {
+            string[] cases = output.Split('\n').ToList().Where(x=>!x.Equals("")).ToArray();
+            string[] inputs = input.Split(';').Take(input.Split(';').Length-1).ToArray();
+            string[] expected = new string[cases.Length];
+            int index = 0;
+            inputs.ToList().ForEach(x=> expected[index++]=Polygons(x).Trim());
+            index = 0;
+            cases.ToList().ForEach(x => { if (x.Equals(expected[index++])) { Console.WriteLine("YES"); } else { Console.WriteLine("NO"); } });
+            Console.WriteLine();
+        }
+
+        private static string PolygonTestCases()
+        {
+            string ret = "";
             List<int>[] data = {
                 new List<int>{ 1, 1, 1 },
                 new List<int>{ 1, 2, 1 },
@@ -216,11 +237,13 @@ namespace CodeVIta
             };
             data.ToList().ForEach(x =>
             {
-                Console.WriteLine("For input: ");
-                ShowPolygonsInputs(x);
-                Console.WriteLine("The output is: ");
-                Polygons(x.Count, x.ToArray());
+                x.ForEach(y=> {
+                    ret += (y + ",");
+                });
+                ret = new string(ret.Take(ret.Count() - 1).ToArray());
+                ret += (";");
             });
+            return ret;
         }
 
         private static void ShowPolygonsInputs(List<int> x)
@@ -265,8 +288,13 @@ namespace CodeVIta
         }
 
         //No length is bigger or equal to the sum of all lengths
-        public static void Polygons(int amount, int[] lengths)
+        public static string Polygons(string input)
         {
+            int amount = input.Split(',').Length;
+            int[] lengths = new int[amount];
+            int index = 0;
+            input.Split(',').ToList().ForEach(x=> { lengths[index++]=int.Parse(x); });
+            string ret = "";
             bool result = true;
             double sum = 0;
             for (int i = 0; i < amount; i++)
@@ -282,13 +310,13 @@ namespace CodeVIta
             }
             if (result)
             {
-                Console.WriteLine("YES");
+                ret+=("YES\n");
             }
             else
             {
-                Console.WriteLine("NO");
+                ret += ("NO\n");
             }
-            Console.WriteLine();
+            return ret + "\n";
         }
 
         #endregion
