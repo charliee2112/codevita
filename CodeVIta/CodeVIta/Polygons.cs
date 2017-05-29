@@ -14,7 +14,34 @@ namespace CodeVIta
             string[] inputs = input.Split(';').Take(input.Split(';').Length - 1).ToArray();
             string[] expected = new string[cases.Length];
             int index = 0;
-            inputs.ToList().ForEach(x => expected[index++] = Polygons(x).Trim());
+            inputs.ToList().ForEach(x => {
+                int amount = x.Split(',').Length;
+                int[] lengths = new int[amount];
+                int j = 0;
+                x.Split(',').ToList().ForEach(y => { lengths[j++] = int.Parse(y); });
+                string ret = "";
+                bool result = true;
+                double sum = 0;
+                for (int i = 0; i < amount; i++)
+                {
+                    sum += lengths[i];
+                }
+                for (int i = 0; i < amount; i++)
+                {
+                    if (lengths[i] >= (sum / 2))
+                    {
+                        result = false;
+                    }
+                }
+                if (result)
+                {
+                    ret += ("YES\n");
+                }
+                else
+                {
+                    ret += ("NO\n");
+                }
+                expected[index++] = ret.Trim(); });
             index = 0;
             cases.ToList().ForEach(x => { if (x.Equals(expected[index++])) { Console.WriteLine("YES"); } else { Console.WriteLine("NO"); } });
             Console.WriteLine();
@@ -46,18 +73,7 @@ namespace CodeVIta
             });
             return ret;
         }
-
-        private static void ShowPolygonsInputs(List<int> x)
-        {
-            Console.Write("{ ");
-            x.ForEach(y =>
-            {
-                Console.Write(y + " ");
-            });
-            Console.Write("}");
-            Console.WriteLine();
-        }
-
+        
         //No length can be bigger or equal than the sum of the others
         public static void Polygons2(int amount, int[] lengths)
         {

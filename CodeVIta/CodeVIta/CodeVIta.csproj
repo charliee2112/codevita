@@ -47,6 +47,8 @@
     <Compile Include="Polygons.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Superman.cs" />
+    <Compile Include="TommAndJery.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
